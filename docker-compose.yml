@@ -1,0 +1,35 @@
+version: "3.8"
+services:
+  app:
+    build: .
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/usr/src/app
+    env_file:
+      - ./.env
+    depends_on:
+      - postgres_db
+
+  postgres_db:
+    image: postgis/postgis:14-3.3
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=password
+      - POSTGRES_DB=localizabaño
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+
+  # --- SERVICIO OPCIONAL PARA PRUEBAS CON MARIADB ---
+  # mariadb_db:
+  #   image: mariadb:10.6
+  #   environment:
+  #     - MARIADB_ROOT_PASSWORD=password
+  #     - MARIADB_DATABASE=localizabaño
+  #   ports:
+  #     - "3306:3306"
+
+volumes:
+  postgres_data:
