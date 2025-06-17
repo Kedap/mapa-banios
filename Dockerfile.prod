@@ -1,0 +1,26 @@
+# --- Etapa 1: Builder ---
+# Instala dependencias (incluyendo devDependencies para sequelize-cli)
+FROM node:18-alpine AS builder
+WORKDIR /usr/src/app
+COPY package*.json ./
+RUN npm install
+COPY . .
+
+# --- Etapa 2: Runner ---
+# Imagen final, ligera y segura
+FROM node:18-alpine
+WORKDIR /usr/src/app
+
+# Copia solo lo necesario desde la etapa 'builder'
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/package*.json ./
+COPY --from=builder /usr/src/app/app.js ./app.js
+COPY --from=builder /usr/src/app/config ./config
+COPY --from=builder /usr/src/app/models ./models
+COPY --from=builder /usr/src/app/migrations ./migrations
+COPY --from=builder /usr/src/app/seeders ./seeders
+COPY --from=builder /usr/src/app/public ./public
+COPY --from=builder /usr/src/app/routes ./routes
+
+# Comando para producción: migra, siembra y arranca la app con node.
+CMD [ "sh", "-c", "npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all && node app.js" ]
