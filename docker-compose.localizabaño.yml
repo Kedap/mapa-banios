@@ -1,7 +1,6 @@
 version: "3.8"
 
 services:
-  # Servicio de la aplicación Node.js
   app_localizabaño:
     build:
       context: .
@@ -15,7 +14,6 @@ services:
       - default # Red interna para comunicarse con la BD
       - nginx_proxy_manager_network # Red externa para comunicarse con el proxy
 
-  # Servicio de la Base de Datos PostGIS
   postgres_db_localizabaño:
     image: postgis/postgis:14-3.3
     container_name: localizabaño_db
@@ -24,12 +22,12 @@ services:
     volumes:
       - postgres_localizabaño_data:/var/lib/postgresql/data
     networks:
-      - default # Solo necesita estar en la red interna
+      - default
 
 volumes:
-  postgres_localizabaño_data: # Volumen de datos único para esta app
+  postgres_localizabaño_data:
 
 networks:
   nginx_proxy_manager_network:
-    external: true # ¡Clave! Le dice a Docker que esta red ya existe.
-    name: nombre_de_la_red_del_proxy # <-- REEMPLAZARÁS ESTO
+    external: true
+    name: nginx_default

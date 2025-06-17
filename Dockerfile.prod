@@ -1,4 +1,3 @@
-# --- Etapa 1: Builder ---
 # Instala dependencias (incluyendo devDependencies para sequelize-cli)
 FROM node:18-alpine AS builder
 WORKDIR /usr/src/app
