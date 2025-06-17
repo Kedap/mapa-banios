@@ -6,6 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let map;
   let newBathroomLocation = null;
   let tempMarker = null;
+  let allUsers = [];
   const API_BASE_URL = "http://localhost:3000/api"; // La URL base de tu API
 
   /**
@@ -15,6 +16,7 @@ document.addEventListener("DOMContentLoaded", () => {
     console.log("🚀 Aplicación iniciada.");
     initMap();
     loadAllBathrooms();
+    loadAllUsers();
 
     addBathroomBtn.addEventListener("click", renderAddBathroomForm);
 
@@ -80,57 +82,70 @@ document.addEventListener("DOMContentLoaded", () => {
    */
   async function loadBathroomDetails(bañoId) {
     try {
-      sidebarContent.innerHTML = "<p>Cargando detalles...</p>"; // Muestra un estado de carga
-
-      console.log(`ℹ️  Pidiendo detalles para el baño ID: ${bañoId}`);
+      sidebarContent.innerHTML = "<p>Cargando detalles...</p>";
       const response = await fetch(`${API_BASE_URL}/banios/${bañoId}`);
-
-      if (!response.ok) {
-        throw new Error(`Baño con ID ${bañoId} no encontrado.`);
-      }
-
+      if (!response.ok) throw new Error(`Baño con ID ${bañoId} no encontrado.`);
       const baño = await response.json();
-      console.log("✔️  Detalles recibidos:", baño);
 
+      // Construimos el HTML dinámicamente
       const html = `
-                <h3>${baño.nombre}</h3>
-                <p><strong>Dirección:</strong> ${baño.direccion || "No especificada"}</p>
-                <p><strong>Costo:</strong> $${parseFloat(baño.costo).toFixed(2)}</p>
-                <p><strong>Estado:</strong> ${baño.estado}</p>
+            <h3>${baño.nombre}</h3>
+            <p><strong>Dirección:</strong> ${baño.direccion || "No especificada"}</p>
+            <p><strong>Costo:</strong> $${parseFloat(baño.costo).toFixed(2)}</p>
+            <p><strong>Estado:</strong> ${baño.estado}</p>
+            
+            <h4>Características:</h4>
+            <ul class="caracteristicas-list">
+                ${baño.Caracteristicas.length > 0 ? baño.Caracteristicas.map((c) => `<li>✔️ ${c.nombre_caracteristica}</li>`).join("") : "<li>No hay características especificadas.</li>"}
+            </ul>
+
+            <h4>Reseñas (${baño.Reseñas.length}):</h4>
+            <ul class="reseñas-list">
+                ${
+                  baño.Reseñas.length > 0
+                    ? baño.Reseñas.map(
+                        (r) => `
+                    <li>
+                        <strong>${r.Usuario ? r.Usuario.nombre_usuario : "Anónimo"}</strong> 
+                        <small>(${new Date(r.fecha_reseña).toLocaleDateString()})</small>
+                        <p>Limpieza: ${"⭐".repeat(r.calificacion_limpieza)}${"☆".repeat(5 - r.calificacion_limpieza)}</p>
+                        <p>Seguridad: ${"⭐".repeat(r.calificacion_seguridad)}${"☆".repeat(5 - r.calificacion_seguridad)}</p>
+                        <p>${r.comentario || ""}</p>
+                    </li>
+                `,
+                      ).join("")
+                    : "<li>Aún no hay reseñas para este lugar. ¡Sé el primero!</li>"
+                }
+            </ul>
+            
+            <hr>
+            <!-- ¡NUEVO FORMULARIO PARA AÑADIR RESEÑAS! -->
+            <h4>Deja tu Reseña</h4>
+            <form id="add-review-form">
+                <label for="review-user">Soy el usuario:</label>
+                <select id="review-user" name="id_usuario" required>
+                    ${allUsers.map((user) => `<option value="${user.id_usuario}">${user.nombre_usuario}</option>`).join("")}
+                </select>
+
+                <label>Limpieza:</label>
+                <div>${[1, 2, 3, 4, 5].map((n) => `<span>${n}⭐</span> <input type="radio" name="calificacion_limpieza" value="${n}" required>`).join(" ")}</div>
+
+                <label>Seguridad:</label>
+                <div>${[1, 2, 3, 4, 5].map((n) => `<span>${n}⭐</span> <input type="radio" name="calificacion_seguridad" value="${n}" required>`).join(" ")}</div>
                 
-                <h4>Características:</h4>
-                <ul class="caracteristicas-list">
-                    ${
-                      baño.Caracteristicas && baño.Caracteristicas.length > 0
-                        ? baño.Caracteristicas.map(
-                            (c) => `<li>✔️ ${c.nombre_caracteristica}</li>`,
-                          ).join("")
-                        : "<li>No hay características especificadas.</li>"
-                    }
-                </ul>
+                <label for="review-comment">Comentario:</label>
+                <textarea id="review-comment" name="comentario" rows="3"></textarea>
+                
+                <button type="submit">Enviar Reseña</button>
+            </form>
+        `;
 
-                <h4>Reseñas (${baño.Reseñas.length}):</h4>
-                <ul class="reseñas-list">
-                    ${
-                      baño.Reseñas && baño.Reseñas.length > 0
-                        ? baño.Reseñas.map(
-                            (r) => `
-                            <li>
-                                <strong>${r.Usuario ? r.Usuario.nombre_usuario : "Anónimo"}</strong> 
-                                <small>(${new Date(r.fecha_reseña).toLocaleDateString()})</small>
-                                <p>Limpieza: ${"⭐".repeat(r.calificacion_limpieza)}${"☆".repeat(5 - r.calificacion_limpieza)}</p>
-                                <p>Seguridad: ${"⭐".repeat(r.calificacion_seguridad)}${"☆".repeat(5 - r.calificacion_seguridad)}</p>
-                                <p>${r.comentario || ""}</p>
-                            </li>
-                        `,
-                          ).join("")
-                        : "<li>Aún no hay reseñas para este lugar. ¡Sé el primero!</li>"
-                    }
-                </ul>
-            `;
-
-      // Reemplazamos el contenido del panel con el nuevo HTML
       sidebarContent.innerHTML = html;
+
+      // Añadimos el listener al formulario que acabamos de crear
+      document
+        .getElementById("add-review-form")
+        .addEventListener("submit", (e) => handleAddReviewSubmit(e, bañoId));
     } catch (error) {
       console.error(
         `❌ Error al cargar los detalles del baño ${bañoId}:`,
@@ -313,6 +328,63 @@ document.addEventListener("DOMContentLoaded", () => {
       tempMarker = null;
     } catch (error) {
       console.error("❌ Error al enviar el formulario:", error);
+      alert(`Error: ${error.message}`);
+    }
+  }
+
+  async function loadAllUsers() {
+    try {
+      const response = await fetch(`${API_BASE_URL}/usuarios`);
+      if (!response.ok) throw new Error("No se pudieron cargar los usuarios.");
+      allUsers = await response.json();
+      console.log(
+        `✔️  ${allUsers.length} usuarios cargados para los selectores.`,
+      );
+    } catch (error) {
+      console.error("❌ Error al cargar usuarios:", error);
+    }
+  }
+
+  /**
+   * Maneja el envío del formulario para crear una nueva reseña.
+   * @param {Event} e - El objeto del evento de envío.
+   * @param {number} bañoId - El ID del baño al que pertenece la reseña.
+   */
+  async function handleAddReviewSubmit(e, bañoId) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const reviewData = {
+      id_baño: bañoId,
+      id_usuario: formData.get("id_usuario"),
+      calificacion_limpieza: formData.get("calificacion_limpieza"),
+      calificacion_seguridad: formData.get("calificacion_seguridad"),
+      comentario: formData.get("comentario"),
+    };
+
+    console.log("📤 Enviando nueva reseña:", reviewData);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/resenias`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reviewData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al guardar la reseña.");
+      }
+
+      console.log("✔️ Reseña creada exitosamente.");
+      alert("¡Gracias por tu reseña!");
+
+      // Refrescamos los detalles del baño para mostrar la nueva reseña
+      loadBathroomDetails(bañoId);
+    } catch (error) {
+      console.error("❌ Error al enviar la reseña:", error);
       alert(`Error: ${error.message}`);
     }
   }
