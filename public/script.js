@@ -74,15 +74,81 @@ document.addEventListener("DOMContentLoaded", () => {
         // --- Evento de Clic ---
         // Al hacer clic en un marcador, se cargarán sus detalles.
         marker.on("click", () => {
-          // Por ahora, solo un log en consola para verificar que funciona
-          console.log(`Clic en el baño con ID: ${baño.id_baño}`);
-          // En el siguiente paso, implementaremos la función que muestra los detalles.
-          // loadBathroomDetails(baño.id_baño);
+          // Ahora llamamos a la función para cargar los detalles en el panel lateral.
+          loadBathroomDetails(baño.id_baño);
         });
       });
     } catch (error) {
       console.error("❌ Error al cargar los baños:", error);
       sidebarContent.innerHTML = `<p style="color: red;">No se pudieron cargar los datos del mapa. Asegúrate de que el servidor backend esté corriendo.</p>`;
+    }
+  }
+
+  /**
+   * Carga los detalles de un baño específico desde la API
+   * y los muestra en el panel lateral.
+   * @param {number} bañoId - El ID del baño a cargar.
+   */
+  async function loadBathroomDetails(bañoId) {
+    try {
+      sidebarContent.innerHTML = "<p>Cargando detalles...</p>"; // Muestra un estado de carga
+
+      console.log(`ℹ️  Pidiendo detalles para el baño ID: ${bañoId}`);
+      const response = await fetch(`${API_BASE_URL}/banios/${bañoId}`);
+
+      if (!response.ok) {
+        throw new Error(`Baño con ID ${bañoId} no encontrado.`);
+      }
+
+      const baño = await response.json();
+      console.log("✔️  Detalles recibidos:", baño);
+
+      // Construimos el HTML dinámicamente usando los datos recibidos de la API
+      const html = `
+                <h3>${baño.nombre}</h3>
+                <p><strong>Dirección:</strong> ${baño.direccion || "No especificada"}</p>
+                <p><strong>Costo:</strong> $${parseFloat(baño.costo).toFixed(2)}</p>
+                <p><strong>Estado:</strong> ${baño.estado}</p>
+                
+                <h4>Características:</h4>
+                <ul class="caracteristicas-list">
+                    ${
+                      baño.Caracteristicas && baño.Caracteristicas.length > 0
+                        ? baño.Caracteristicas.map(
+                            (c) => `<li>✔️ ${c.nombre_caracteristica}</li>`,
+                          ).join("")
+                        : "<li>No hay características especificadas.</li>"
+                    }
+                </ul>
+
+                <h4>Reseñas (${baño.Reseñas.length}):</h4>
+                <ul class="reseñas-list">
+                    ${
+                      baño.Reseñas && baño.Reseñas.length > 0
+                        ? baño.Reseñas.map(
+                            (r) => `
+                            <li>
+                                <strong>${r.Usuario ? r.Usuario.nombre_usuario : "Anónimo"}</strong> 
+                                <small>(${new Date(r.fecha_reseña).toLocaleDateString()})</small>
+                                <p>Limpieza: ${"⭐".repeat(r.calificacion_limpieza)}${"☆".repeat(5 - r.calificacion_limpieza)}</p>
+                                <p>Seguridad: ${"⭐".repeat(r.calificacion_seguridad)}${"☆".repeat(5 - r.calificacion_seguridad)}</p>
+                                <p>${r.comentario || ""}</p>
+                            </li>
+                        `,
+                          ).join("")
+                        : "<li>Aún no hay reseñas para este lugar. ¡Sé el primero!</li>"
+                    }
+                </ul>
+            `;
+
+      // Reemplazamos el contenido del panel con el nuevo HTML
+      sidebarContent.innerHTML = html;
+    } catch (error) {
+      console.error(
+        `❌ Error al cargar los detalles del baño ${bañoId}:`,
+        error,
+      );
+      sidebarContent.innerHTML = `<p style="color: red;">No se pudieron cargar los detalles de este baño.</p>`;
     }
   }
 
