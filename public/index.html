@@ -12,25 +12,19 @@
       crossorigin=""
     />
 
-    <!-- 2. Tu propia Hoja de Estilos -->
     <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <!-- Contenedor Principal de la Aplicación -->
     <div id="app-container">
-      <!-- Contenedor donde se renderizará el Mapa -->
       <div id="map"></div>
 
-      <!-- Panel Lateral para mostrar información dinámica -->
       <div id="sidebar">
-        <!-- Botón para añadir un nuevo baño (visible siempre) -->
         <div id="actions-container">
           <button id="add-bathroom-btn">Añadir Nuevo Baño</button>
         </div>
 
         <hr />
 
-        <!-- El contenido dinámico se inyectará aquí con JavaScript -->
         <div id="sidebar-content">
           <h2>Bienvenido a LocalizaBaño</h2>
           <p>
@@ -44,14 +38,12 @@
       </div>
     </div>
 
-    <!-- 3. Librería JavaScript de Leaflet (requerido) -->
     <script
       src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"
       integrity="sha256-20nQCchB9co0qIjJZRGuk2/Z9VM+kNiyxNV1lvTlZBo="
       crossorigin=""
     ></script>
 
-    <!-- 4. Tu propio archivo JavaScript (siempre al final) -->
     <script src="script.js"></script>
   </body>
 </html>

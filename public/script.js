@@ -1,12 +1,9 @@
-// --- Evento Principal: Espera a que el HTML esté completamente cargado ---
 document.addEventListener("DOMContentLoaded", () => {
-  // --- Referencias a Elementos del DOM que usaremos ---
   const mapDiv = document.getElementById("map");
   const sidebarContent = document.getElementById("sidebar-content");
   const addBathroomBtn = document.getElementById("add-bathroom-btn");
 
-  // --- Variables Globales y Configuración ---
-  let map; // Guardará la instancia del mapa Leaflet
+  let map;
   const API_BASE_URL = "http://localhost:3000/api"; // La URL base de tu API
 
   /**
@@ -17,10 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
     initMap();
     loadAllBathrooms();
 
-    // Asignar eventos a los botones principales
     addBathroomBtn.addEventListener("click", () => {
-      // Por ahora, solo mostramos un mensaje.
-      // Más adelante, esto mostrará el formulario para añadir un baño.
       alert("Funcionalidad para añadir baño no implementada todavía.");
     });
   }
@@ -32,7 +26,6 @@ document.addEventListener("DOMContentLoaded", () => {
     // Coordenadas iniciales [latitud, longitud] y nivel de zoom
     map = L.map(mapDiv).setView([19.4326, -99.1332], 13);
 
-    // Carga y añade la capa de mapa base de OpenStreetMap
     L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
       attribution:
         '© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
@@ -58,9 +51,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const baños = await response.json();
       console.log(`✔️  ${baños.length} baños cargados.`);
 
-      // Limpiamos los marcadores existentes antes de añadir nuevos (buena práctica)
-      // Por ahora no es necesario, pero lo será si implementamos filtros.
-
       baños.forEach((baño) => {
         // Leaflet usa [latitud, longitud], pero GeoJSON usa [longitud, latitud]
         const [longitude, latitude] = baño.ubicacion.coordinates;
@@ -68,13 +58,10 @@ document.addEventListener("DOMContentLoaded", () => {
         // Crea un marcador para cada baño
         const marker = L.marker([latitude, longitude]).addTo(map);
 
-        // Añade un popup simple con el nombre del baño
         marker.bindPopup(`<b>${baño.nombre}</b>`);
 
         // --- Evento de Clic ---
-        // Al hacer clic en un marcador, se cargarán sus detalles.
         marker.on("click", () => {
-          // Ahora llamamos a la función para cargar los detalles en el panel lateral.
           loadBathroomDetails(baño.id_baño);
         });
       });
@@ -103,7 +90,6 @@ document.addEventListener("DOMContentLoaded", () => {
       const baño = await response.json();
       console.log("✔️  Detalles recibidos:", baño);
 
-      // Construimos el HTML dinámicamente usando los datos recibidos de la API
       const html = `
                 <h3>${baño.nombre}</h3>
                 <p><strong>Dirección:</strong> ${baño.direccion || "No especificada"}</p>
@@ -152,6 +138,5 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   }
 
-  // --- Inicia la aplicación ---
   init();
 });
