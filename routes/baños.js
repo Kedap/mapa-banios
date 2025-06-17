@@ -4,7 +4,7 @@ const router = express.Router();
 const { Baño, Reseña, Caracteristica, Usuario } = require("../models");
 const { Op } = require("sequelize");
 
-// GET /api/baños
+// GET /api/banios
 router.get("/", async (req, res) => {
   try {
     const baños = await Baño.findAll({

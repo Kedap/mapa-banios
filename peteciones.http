@@ -1,0 +1,60 @@
+@host = localhost:3000
+
+###
+
+GET {{host}}/api/banios
+
+###
+
+GET {{host}}/api/banios/1
+
+###
+
+GET {{host}}/api/resenias
+
+###
+
+GET {{host}}/api/caracteristicas
+
+###
+
+GET {{host}}/api/usuarios
+
+###
+
+POST {{host}}/api/resenias
+
+{
+  "id_usuario": 1,
+  "id_baño": 3,
+  "calificacion_limpieza": 4,
+  "calificacion_seguridad": 3,
+  "comentario": "Probando API"
+}
+
+###
+
+POST {{host}}/api/reportes
+
+{
+  "id_usuario": 2,
+  "id_baño": 5,
+  "tipo_reporte": "Dato Incorrecto",
+  "descripcion": "El costo real es de 12 pesos, no de 10."
+}
+
+###
+
+POST {{host}}/api/banios
+
+{
+  "nombre": "Cafetería El Rincón Feliz",
+  "direccion": "Calle Falsa 123",
+  "ubicacion": {
+    "type": "Point",
+    "coordinates": [-99.15, 19.40]
+  },
+  "costo": 0,
+  "estado": "Activo",
+  "caracteristicas": [2, 5]
+}

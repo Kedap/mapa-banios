@@ -6,9 +6,10 @@ module.exports = (sequelize, DataTypes) => {
       this.hasMany(models.Reseña, { foreignKey: "id_baño" });
       this.hasMany(models.Reporte, { foreignKey: "id_baño" });
 
-      // Relación Muchos a Muchos con Características
+      // ¡AQUÍ ESTÁ EL CAMBIO!
+      // En lugar de un objeto de configuración, pasamos el modelo directamente.
       this.belongsToMany(models.Caracteristica, {
-        through: "BAÑO_CARACTERISTICAS", // La tabla de unión
+        through: models.BAÑO_CARACTERISTICAS, // Usamos el modelo que acabamos de crear
         foreignKey: "id_baño",
         otherKey: "id_caracteristica",
       });
