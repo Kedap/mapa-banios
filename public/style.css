@@ -100,3 +100,53 @@ html {
 .reseñas-list p {
   margin-top: 5px;
 }
+
+/* --- Estilos para Formularios --- */
+#add-bathroom-form {
+  display: flex;
+  flex-direction: column;
+  gap: 15px; /* Espacio entre elementos del formulario */
+}
+
+#add-bathroom-form label {
+  font-weight: bold;
+  margin-bottom: -10px; /* Reduce espacio entre label y su input */
+}
+
+#add-bathroom-form input[type="text"],
+#add-bathroom-form input[type="number"],
+#add-bathroom-form textarea,
+#add-bathroom-form select {
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
+#add-bathroom-form button {
+  padding: 10px;
+  border: none;
+  border-radius: 4px;
+  color: white;
+  cursor: pointer;
+}
+
+#add-bathroom-form button[type="submit"] {
+  background-color: #28a745; /* Verde */
+}
+
+#add-bathroom-form button[type="submit"]:hover {
+  background-color: #218838;
+}
+
+#add-bathroom-form #cancel-btn {
+  background-color: #dc3545; /* Rojo */
+}
+
+#add-bathroom-form #cancel-btn:hover {
+  background-color: #c82333;
+}
+
+#caracteristicas-checkboxes div {
+  margin-bottom: 5px;
+}
