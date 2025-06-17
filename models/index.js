@@ -8,14 +8,11 @@ const basename = path.basename(__filename);
 const env = process.env.NODE_ENV || "development";
 
 // --- ¡ESTE ES EL CAMBIO PRINCIPAL! ---
-// Apuntamos al archivo de configuración JavaScript en lugar del JSON.
 const config = require(path.join(__dirname, "/../config/config.js"))[env];
 
 const db = {};
 
 let sequelize;
-// Esta lógica permite que la configuración use una variable de entorno como DATABASE_URL (para Heroku, etc.)
-// o los datos de nuestro config.js para desarrollo local.
 if (config.use_env_variable) {
   sequelize = new Sequelize(process.env[config.use_env_variable], config);
 } else {

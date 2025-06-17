@@ -1,10 +1,9 @@
 "use strict";
 const express = require("express");
 const router = express.Router();
-const { Baño, Reseña, Caracteristica, Usuario } = require("../models"); // Importamos los modelos que necesitamos
-const { Op } = require("sequelize"); // Importamos operadores para consultas más complejas
+const { Baño, Reseña, Caracteristica, Usuario } = require("../models");
+const { Op } = require("sequelize");
 
-// --- RUTA 1: Obtener TODOS los baños (para mostrar en el mapa) ---
 // GET /api/baños
 router.get("/", async (req, res) => {
   try {
@@ -18,7 +17,6 @@ router.get("/", async (req, res) => {
   }
 });
 
-// --- RUTA 2: Obtener UN baño específico con TODOS sus detalles ---
 // GET /api/baños/:id
 router.get("/:id", async (req, res) => {
   try {
@@ -28,18 +26,18 @@ router.get("/:id", async (req, res) => {
       include: [
         {
           model: Reseña,
-          as: "Reseñas", // Si definiste un alias en el modelo
+          as: "Reseñas",
           include: [
             {
               model: Usuario,
-              attributes: ["nombre_usuario"], // No queremos enviar el hash de la contraseña
+              attributes: ["nombre_usuario"],
             },
           ],
         },
         {
           model: Caracteristica,
           as: "Caracteristicas",
-          through: { attributes: [] }, // No incluir la tabla de unión en el resultado
+          through: { attributes: [] },
         },
       ],
     });
@@ -51,6 +49,44 @@ router.get("/:id", async (req, res) => {
     res.status(200).json(baño);
   } catch (error) {
     console.error(`Error al obtener el baño con id ${req.params.id}:`, error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+});
+
+router.post("/", async (req, res) => {
+  try {
+    const { nombre, direccion, ubicacion, costo, estado, caracteristicas } =
+      req.body;
+
+    if (!nombre || !ubicacion) {
+      return res
+        .status(400)
+        .json({ error: "El nombre y la ubicación son obligatorios." });
+    }
+
+    // 1. Crear el baño
+    const nuevoBaño = await Baño.create({
+      nombre,
+      direccion,
+      ubicacion,
+      costo,
+      estado,
+    });
+
+    // 2. Asociar las características (si se enviaron)
+    // "setCaracteristicas" es un método mágico que Sequelize añade a nuestro modelo
+    // gracias a la relación `belongsToMany` que definimos.
+    if (caracteristicas && caracteristicas.length > 0) {
+      await nuevoBaño.setCaracteristicas(caracteristicas);
+    }
+
+    const bañoCompleto = await Baño.findByPk(nuevoBaño.id_baño, {
+      include: [{ model: Caracteristica }],
+    });
+
+    res.status(201).json(bañoCompleto);
+  } catch (error) {
+    console.error("Error al crear el baño:", error);
     res.status(500).json({ error: "Error interno del servidor" });
   }
 });

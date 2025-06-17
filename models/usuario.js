@@ -3,7 +3,6 @@ const { Model } = require("sequelize");
 module.exports = (sequelize, DataTypes) => {
   class Usuario extends Model {
     static associate(models) {
-      // Define las relaciones aquí
       this.hasMany(models.Reseña, {
         foreignKey: "id_usuario",
       });
@@ -29,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         unique: true,
         validate: {
-          isEmail: true, // Validación incorporada
+          isEmail: true,
         },
       },
       password_hash: {
@@ -41,9 +40,9 @@ module.exports = (sequelize, DataTypes) => {
       sequelize,
       modelName: "Usuario",
       tableName: "USUARIOS", // Nombre explícito de la tabla
-      timestamps: true, // Sequelize manejará `createdAt` y `updatedAt`
-      createdAt: "fecha_registro", // Mapea `createdAt` a tu columna
-      updatedAt: false, // No necesitamos `updatedAt` para esta tabla
+      timestamps: true,
+      createdAt: "fecha_registro",
+      updatedAt: false,
     },
   );
   return Usuario;
