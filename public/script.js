@@ -87,7 +87,6 @@ document.addEventListener("DOMContentLoaded", () => {
       if (!response.ok) throw new Error(`Baño con ID ${bañoId} no encontrado.`);
       const baño = await response.json();
 
-      // Construimos el HTML dinámicamente
       const html = `
             <h3>${baño.nombre}</h3>
             <p><strong>Dirección:</strong> ${baño.direccion || "No especificada"}</p>
@@ -114,38 +113,61 @@ document.addEventListener("DOMContentLoaded", () => {
                     </li>
                 `,
                       ).join("")
-                    : "<li>Aún no hay reseñas para este lugar. ¡Sé el primero!</li>"
+                    : "<li>Aún no hay reseñas para este lugar.</li>"
                 }
             </ul>
             
             <hr>
-            <!-- ¡NUEVO FORMULARIO PARA AÑADIR RESEÑAS! -->
             <h4>Deja tu Reseña</h4>
             <form id="add-review-form">
+                 <!-- ... (Tu formulario de reseña existente va aquí) ... -->
                 <label for="review-user">Soy el usuario:</label>
                 <select id="review-user" name="id_usuario" required>
                     ${allUsers.map((user) => `<option value="${user.id_usuario}">${user.nombre_usuario}</option>`).join("")}
                 </select>
-
                 <label>Limpieza:</label>
                 <div>${[1, 2, 3, 4, 5].map((n) => `<span>${n}⭐</span> <input type="radio" name="calificacion_limpieza" value="${n}" required>`).join(" ")}</div>
-
                 <label>Seguridad:</label>
                 <div>${[1, 2, 3, 4, 5].map((n) => `<span>${n}⭐</span> <input type="radio" name="calificacion_seguridad" value="${n}" required>`).join(" ")}</div>
-                
                 <label for="review-comment">Comentario:</label>
                 <textarea id="review-comment" name="comentario" rows="3"></textarea>
-                
                 <button type="submit">Enviar Reseña</button>
+            </form>
+
+            <hr>
+            <!-- ¡NUEVO FORMULARIO PARA REPORTAR UN PROBLEMA! -->
+            <h4>Reportar un Problema</h4>
+            <form id="add-report-form">
+                <label for="report-user">Soy el usuario:</label>
+                <select id="report-user" name="id_usuario" required>
+                    ${allUsers.map((user) => `<option value="${user.id_usuario}">${user.nombre_usuario}</option>`).join("")}
+                </select>
+
+                <label for="report-type">Tipo de Problema:</label>
+                <select id="report-type" name="tipo_reporte" required>
+                    <option value="Ubicación Incorrecta">Ubicación Incorrecta</option>
+                    <option value="Permanentemente Cerrado">Permanentemente Cerrado</option>
+                    <option value="Horario Incorrecto">Horario Incorrecto</option>
+                    <option value="Mantenimiento Urgente">Mantenimiento Urgente</option>
+                    <option value="Otro">Otro</option>
+                </select>
+
+                <label for="report-description">Descripción (opcional):</label>
+                <textarea id="report-description" name="descripcion" rows="3"></textarea>
+                
+                <button type="submit">Enviar Reporte</button>
             </form>
         `;
 
       sidebarContent.innerHTML = html;
 
-      // Añadimos el listener al formulario que acabamos de crear
+      // Añadimos los listeners a AMBOS formularios
       document
         .getElementById("add-review-form")
         .addEventListener("submit", (e) => handleAddReviewSubmit(e, bañoId));
+      document
+        .getElementById("add-report-form")
+        .addEventListener("submit", (e) => handleAddReportSubmit(e, bañoId));
     } catch (error) {
       console.error(
         `❌ Error al cargar los detalles del baño ${bañoId}:`,
@@ -385,6 +407,50 @@ document.addEventListener("DOMContentLoaded", () => {
       loadBathroomDetails(bañoId);
     } catch (error) {
       console.error("❌ Error al enviar la reseña:", error);
+      alert(`Error: ${error.message}`);
+    }
+  }
+
+  /**
+   * Maneja el envío del formulario para crear un nuevo reporte.
+   * @param {Event} e - El objeto del evento de envío.
+   * @param {number} bañoId - El ID del baño que está siendo reportado.
+   */
+  async function handleAddReportSubmit(e, bañoId) {
+    e.preventDefault();
+
+    const form = e.target;
+    const formData = new FormData(form);
+
+    const reportData = {
+      id_baño: bañoId,
+      id_usuario: formData.get("id_usuario"),
+      tipo_reporte: formData.get("tipo_reporte"),
+      descripcion: formData.get("descripcion"),
+    };
+
+    console.log("📤 Enviando nuevo reporte:", reportData);
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/reportes`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(reportData),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "Error al enviar el reporte.");
+      }
+
+      console.log("✔️ Reporte enviado exitosamente.");
+      alert("¡Gracias por tu reporte! Un administrador lo revisará pronto.");
+
+      // Ocultamos el formulario después de enviarlo para dar feedback visual.
+      form.innerHTML =
+        "<p><strong>Reporte enviado. ¡Gracias por ayudar a mantener la comunidad actualizada!</strong></p>";
+    } catch (error) {
+      console.error("❌ Error al enviar el reporte:", error);
       alert(`Error: ${error.message}`);
     }
   }
