@@ -23,7 +23,10 @@
   "main": "app.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon app.js"
+    "start": "nodemon app.js",
+    "docs:init": "cd docs && mdbook init",
+    "docs:serve": "cd docs && mdbook serve",
+    "docs:build": "cd docs && mdbook build"
   },
   "dependencies": {
     "bcryptjs": "^3.0.2",

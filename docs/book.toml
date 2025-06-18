@@ -1,0 +1,5 @@
+[book]
+authors = ["Arellano Palacios Daniel","Anzures Campos Juan Esteban", "Jurado Delgadillo Miguel Angel", "Reyes Arguello Juan Fernando", "Villegas Raymundo Brayan Uriel"]
+language = "es"
+src = "src"
+title = "Manual Técnico - LocalizaBaño"
