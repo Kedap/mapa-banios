@@ -7,7 +7,7 @@ document.addEventListener("DOMContentLoaded", () => {
   let newBathroomLocation = null;
   let tempMarker = null;
   let allUsers = [];
-  const API_BASE_URL = "http://localhost:3000/api"; // La URL base de tu API
+  const API_BASE_URL = "https://mapa.rompevientos.duckdns.org/api"; // La URL base de tu API
 
   /**
    * Función Principal que se ejecuta al inicio

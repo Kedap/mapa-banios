@@ -1,0 +1,34 @@
+version: "3.8"
+
+services:
+  app-localizabano:
+    build:
+      context: .
+      dockerfile: Dockerfile.prod
+    container_name: localizabano_app
+    restart: always
+    env_file: ./.env.prod
+    depends_on:
+      - postgres-localizabano
+    networks:
+      - localizabano_internal
+      - nginx_proxy_manager_network
+
+  postgres-localizabano:
+    image: postgis/postgis:14-3.3
+    container_name: localizabano_db
+    restart: always
+    env_file: ./.env.prod
+    volumes:
+      - localizabano_data:/var/lib/postgresql/data
+    networks:
+      - localizabano_internal
+
+volumes:
+  localizabano_data:
+
+networks:
+  localizabano_internal:
+  nginx_proxy_manager_network:
+    external: true
+    name: vaultwarden_default

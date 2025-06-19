@@ -22,4 +22,5 @@ COPY --from=builder /usr/src/app/public ./public
 COPY --from=builder /usr/src/app/routes ./routes
 
 # Comando para producción: migra, siembra y arranca la app con node.
-CMD [ "sh", "-c", "npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all && node app.js" ]
+# CMD [ "sh", "-c", "npx sequelize-cli db:migrate && npx sequelize-cli db:seed:all && node app.js" ]
+CMD [ "sh", "-c", "npx sequelize-cli db:migrate && node app.js" ]
