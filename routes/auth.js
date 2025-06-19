@@ -5,61 +5,51 @@ const jwt = require("jsonwebtoken");
 const { Usuario } = require("../models");
 const router = express.Router();
 
-// Registro
-router.post("/register", async (req, res) => {
-  const { nombre_usuario, email, password } = req.body;
-  if (!password)
-    return res.status(400).json({ error: "La contraseña es requerida." });
-
-  try {
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const nuevoUsuario = await Usuario.create({
-      nombre_usuario,
-      email,
-      password_hash: hashedPassword,
-    });
-    res.status(201).json({
-      message: "Usuario creado exitosamente",
-      usuario: {
-        id: nuevoUsuario.id_usuario,
-        nombre: nuevoUsuario.nombre_usuario,
-      },
-    });
-  } catch (error) {
-    res.status(400).json({
-      error:
-        "No se pudo registrar el usuario. El email o nombre de usuario ya pueden estar en uso.",
-    });
-  }
-});
-
-// Login
+/**
+ * RUTA: POST /api/auth/login
+ * Propósito: Autenticar a un usuario y, si es administrador, devolver un token JWT.
+ */
 router.post("/login", async (req, res) => {
   const { email, password } = req.body;
+
   try {
-    const usuario = await Usuario.findOne({ where: { email } });
+    // 1. Buscar al usuario por su email
+    const usuario = await Usuario.findOne({ where: { email: email } });
     if (!usuario) {
+      // Usar un mensaje genérico por seguridad
       return res.status(401).json({ error: "Credenciales inválidas." });
     }
 
-    const esValida = await bcrypt.compare(password, usuario.password_hash);
-    if (!esValida) {
+    // 2. Comparar la contraseña enviada con el hash guardado
+    const esPasswordValido = await bcrypt.compare(
+      password,
+      usuario.password_hash,
+    );
+    if (!esPasswordValido) {
       return res.status(401).json({ error: "Credenciales inválidas." });
     }
 
-    // Crear y firmar el token JWT
+    // 3. ¡Verificación Crítica! Asegurarse de que el usuario tiene el rol de administrador.
+    if (usuario.rol !== "admin") {
+      return res
+        .status(403)
+        .json({ error: "Acceso denegado. No eres administrador." });
+    }
+
+    // 4. Si todo es correcto, crear y firmar el token JWT
     const token = jwt.sign(
       {
         id: usuario.id_usuario,
         nombre: usuario.nombre_usuario,
-        rol: usuario.rol,
+        rol: usuario.rol, // Incluir el rol es fundamental
       },
-      process.env.JWT_SECRET,
-      { expiresIn: "8h" },
+      process.env.JWT_SECRET || "un_secreto_por_defecto_muy_seguro", // ¡Usa la variable de entorno!
+      { expiresIn: "8h" }, // El token expira en 8 horas
     );
 
-    res.json({ message: "Login exitoso", token });
+    res.status(200).json({ message: "Login exitoso", token: token });
   } catch (error) {
+    console.error("Error en el login:", error);
     res.status(500).json({ error: "Error interno del servidor." });
   }
 });
