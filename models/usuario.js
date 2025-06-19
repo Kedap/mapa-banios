@@ -35,6 +35,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.STRING,
         allowNull: false,
       },
+      rol: {
+        type: DataTypes.STRING(20),
+        allowNull: false,
+        defaultValue: "usuario", // 'usuario' o 'admin'
+      },
     },
     {
       sequelize,

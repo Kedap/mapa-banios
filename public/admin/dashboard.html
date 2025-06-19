@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin Dashboard - LocalizaBaño</title>
+    <link rel="stylesheet" href="style.css" />
+  </head>
+  <body>
+    <div class="dashboard-container">
+      <header class="dashboard-header">
+        <h1>Dashboard de Administración</h1>
+        <button id="logout-btn">Cerrar Sesión</button>
+      </header>
+      <main>
+        <h2>Reportes Pendientes</h2>
+        <p id="loading-message">Cargando reportes...</p>
+        <table id="reports-table">
+          <thead>
+            <tr>
+              <th>ID Reporte</th>
+              <th>Tipo</th>
+              <th>Baño ID</th>
+              <th>Descripción</th>
+              <th>Acciones</th>
+            </tr>
+          </thead>
+          <tbody id="reports-body">
+            <!-- Las filas se insertarán aquí dinámicamente -->
+          </tbody>
+        </table>
+      </main>
+    </div>
+    <script src="dashboard.js"></script>
+  </body>
+</html>

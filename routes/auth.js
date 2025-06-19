@@ -18,22 +18,18 @@ router.post("/register", async (req, res) => {
       email,
       password_hash: hashedPassword,
     });
-    res
-      .status(201)
-      .json({
-        message: "Usuario creado exitosamente",
-        usuario: {
-          id: nuevoUsuario.id_usuario,
-          nombre: nuevoUsuario.nombre_usuario,
-        },
-      });
+    res.status(201).json({
+      message: "Usuario creado exitosamente",
+      usuario: {
+        id: nuevoUsuario.id_usuario,
+        nombre: nuevoUsuario.nombre_usuario,
+      },
+    });
   } catch (error) {
-    res
-      .status(400)
-      .json({
-        error:
-          "No se pudo registrar el usuario. El email o nombre de usuario ya pueden estar en uso.",
-      });
+    res.status(400).json({
+      error:
+        "No se pudo registrar el usuario. El email o nombre de usuario ya pueden estar en uso.",
+    });
   }
 });
 
@@ -53,8 +49,12 @@ router.post("/login", async (req, res) => {
 
     // Crear y firmar el token JWT
     const token = jwt.sign(
-      { id: usuario.id_usuario, nombre: usuario.nombre_usuario },
-      process.env.JWT_SECRET || "tu_secreto_por_defecto",
+      {
+        id: usuario.id_usuario,
+        nombre: usuario.nombre_usuario,
+        rol: usuario.rol,
+      },
+      process.env.JWT_SECRET,
       { expiresIn: "8h" },
     );
 

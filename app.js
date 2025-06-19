@@ -23,12 +23,16 @@ const reseñasRoutes = require("./routes/reseñas");
 const caracteristicasRoutes = require("./routes/caracteristicas");
 const reportesRoutes = require("./routes/reportes");
 const usuariosRoutes = require("./routes/usuarios");
+const authRoutes = require("./routes/auth");
+const adminRoutes = require("./routes/admin");
 
 app.use("/api/banios", bañosRoutes);
 app.use("/api/resenias", reseñasRoutes);
 app.use("/api/caracteristicas", caracteristicasRoutes);
 app.use("/api/reportes", reportesRoutes);
 app.use("/api/usuarios", usuariosRoutes);
+app.use("/api/auth", authRoutes);
+app.use("/api/admin", adminRoutes);
 
 // --- Conexión a la BD y Arranque del Servidor ---
 app.listen(PORT, async () => {
