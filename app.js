@@ -20,11 +20,15 @@ app.use("/docs", express.static(path.join(__dirname, "docs/book")));
 // --- Rutas de la API ---
 const bañosRoutes = require("./routes/baños");
 const reseñasRoutes = require("./routes/reseñas");
-// ... y tus otras rutas
+const caracteristicasRoutes = require("./routes/caracteristicas");
+const reportesRoutes = require("./routes/reportes");
+const usuariosRoutes = require("./routes/usuarios");
 
 app.use("/api/banios", bañosRoutes);
 app.use("/api/resenias", reseñasRoutes);
-// ... y tus otros app.use para las rutas
+app.use("/api/caracteristicas", caracteristicasRoutes);
+app.use("/api/reportes", reportesRoutes);
+app.use("/api/usuarios", usuariosRoutes);
 
 // --- Conexión a la BD y Arranque del Servidor ---
 app.listen(PORT, async () => {
