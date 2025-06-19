@@ -19,6 +19,7 @@ COPY --from=builder /usr/src/app/models ./models
 COPY --from=builder /usr/src/app/migrations ./migrations
 COPY --from=builder /usr/src/app/seeders ./seeders
 COPY --from=builder /usr/src/app/public ./public
+COPY --from=builder /usr/src/app/docs ./docs
 COPY --from=builder /usr/src/app/routes ./routes
 
 # Comando para producción: migra, siembra y arranca la app con node.
