@@ -190,9 +190,3 @@ Las contribuciones son bienvenidas. Si tienes ideas para mejorar LocalizaBaño, 
 ## Licencia
 
 Este proyecto está bajo la Licencia Apache-2.0. Consulta el archivo `LICENSE` para más detalles.
-
-## Contacto
-
-**Kedap** - kedap.dev@protonmail.com
-
-Proyecto en GitHub: [https://github.com/Kedap/mapa-banios](https://github.com/Kedap/mapa-banios)
